@@ -20,6 +20,6 @@ Gem::Specification.new do |s|
 
   s.files       = Dir["./lib/**/**"] + Dir["./bin/*"]
   s.executables << 'berktacular'
-  s.homepage    = 'https://github.com/csd/berktacular'
+  s.homepage    = 'https://rubygems.org/gems/berktacular'
   s.licenses    = ['Apache License, Version 2.0']
 end
