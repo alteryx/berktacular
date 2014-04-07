@@ -1,7 +1,7 @@
 Berktacular
 ===========
 
-Berktacular is a gem that parses json type chef environemnt files and does things with them.
+Berktacular is a gem that parses json type chef environment files and does things with them.
 It supports an additional json field called "cookbook_locations" containing a hash of cookbook locations at the same level as "cookbook_versions"
 The top level key is the cookbook name.  Under it, the following keys are supported:
 <pre>
@@ -9,7 +9,7 @@ The top level key is the cookbook name.  Under it, the following keys are suppor
   "tag"         : "string-%{version}"
   "auto_upgrade": true
   "rel"         : "path/relative/to/repo_name"
-  "verions"     : version hash of refs*
+  "versions"    : version hash that contains mappings to github commit refs.  see below.
 </pre>
 The special string '%{version}' is replaced with the version from cookbook_versions.
 The 'versions' hash allows the creation of verioned dependancies for cookbooks that are in github but not tagged.  It provides a mapping of arbitrary version strings to a git commit reference.
