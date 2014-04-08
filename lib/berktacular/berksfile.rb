@@ -8,17 +8,17 @@ module Berktacular
       @cookbook_versions  = environment['cookbook_versions']  || {}
       @cookbook_locations = environment['cookbook_locations'] || {}
       @opts = {
-        'upgrade' => opts.has_key?('upgrade') ? opts['upgrade'] : false,
-        'token'   => opts.has_key?('token')   ? opts['token']   : nil,
-        'verbose' => opts.has_key?('verbose') ? opts['verbose'] : false
+        :upgrade => opts.has_key?(:upgrade) ? opts[:upgrade] : false,
+        :token   => opts.has_key?(:token)   ? opts[:token]   : nil,
+        :verbose => opts.has_key?(:verbose) ? opts[:verbose] : false
       }
       @installed = {}
       # only connect once, pass the client to each cookbook.  and only if needed
-      connect_to_git if @opts['upgrade']
+      connect_to_git if @opts[:upgrade]
     end
 
     def env_file
-      if @opts['upgrade']
+      if @opts[:upgrade]
         cookbooks.each do |book|
           @env_hash['cookbook_versions'][book.name] = book.version_specifier
         end
@@ -44,14 +44,12 @@ module Berktacular
       workdir
     end
 
-    # Do not call install before calling this.
-    # this block is taken almost verbatim from environment_to_berksfile
     def verify(workdir = nil)
       require 'ridley'
-      @missing_deps = {} #Hash.new{ |k,v| k[v] = [] }
+      @missing_deps = {}
       workdir       = install(workdir)
       versions      = {}
-      dependancies  = {}
+      dependencies  = {}
       Dir["#{workdir}/*"].each do |cookbook_dir|
         next unless File.directory?(cookbook_dir)
         metadata_path   = File.join(cookbook_dir, 'metadata.rb')
@@ -60,7 +58,7 @@ module Berktacular
         name_from_path  = File.basename(cookbook_dir)
         unless cookbook_name == name_from_path
           if cookbook_name.empty?
-            puts "Cookcook #{name_from_path} has no name specified in metadata.rb"
+            puts "Cookbook #{name_from_path} has no name specified in metadata.rb"
             cookbook_name = name_from_path
           else
             warn "Cookbook name from metadata.rb does not match the directory name!",
@@ -69,10 +67,10 @@ module Berktacular
           end
         end
         versions[cookbook_name] = metadata.version
-        dependancies[cookbook_name] = metadata.dependencies
+        dependencies[cookbook_name] = metadata.dependencies
       end
       errors = false
-      dependancies.each do |name, deps|
+      dependencies.each do |name, deps|
         deps.each do |dep_name, constraint|
           actual_version = versions[dep_name]
           if !actual_version
@@ -118,7 +116,7 @@ module Berktacular
       str << "# Name: '#{@name}'\n" if @name
       str << "# Description: #{@description}\n\n" if @description
       str << "# This file is auto-generated, changes will be overwritten\n"
-      str << "# Modify the .json version of this file to make changes\n\n"
+      str << "# Modify the .json environment file and regenerate this Berksfile to make changes.\n\n"
 
       str << "site :opscode\n\n"
       cookbooks.each { |l| str << l.to_s << "\n" }
@@ -144,9 +142,9 @@ module Berktacular
 
     private
     def connect_to_git
-      raise "No token given, can't connect to git" unless @opts['token']
+      raise "No token given, can't connect to git" unless @opts[:token]
       require 'octokit'
-      @opts['git_client'] ||= Octokit::Client.new(access_token: @opts['token'])      
+      @opts['git_client'] ||= Octokit::Client.new(access_token: @opts[:token])      
     end
 
   end

@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version     = Berktacular::VERSION
   s.date        = Time.now.strftime('%Y-%m-%d')
   s.summary     = 'Parse chef env files, generate berkshelf files and verify them.'
-  s.description = "Generates Berkshelf files from JSON style Chef environment files.  Also support extension to environment file 'cookbook_locations'. " +
-                  "Verifies the Berksfile is consistant (all dependancies met) and will upload updated cookbooks and env files to a chef server."
+  s.description = "Generates a Berksfile from JSON style Chef environment files.  Also support extension to environment file with 'cookbook_locations'. " +
+                  "Verifies the Berksfile is consistent (all dependencies met) and will upload updated cookbooks and env files to a chef server."
   s.authors     = ['Jeff Harvey-Smith']
   s.email       = ['jeff@clearstorydata.com']
 

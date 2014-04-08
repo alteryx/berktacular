@@ -1,5 +1,5 @@
 module Berktacular
-    class Cookbook
+  class Cookbook
     attr_reader :name, :version_number, :auto_upgrade, :config
     def initialize( name, version_spec, config = nil, opts = {} )
       @name             = name          || raise( "Missing cookbook name" )
@@ -9,9 +9,9 @@ module Berktacular
       @auto_upgrade     = config && config['auto_upgrade']  || false
       @versions         = config && config['versions']      || {}
       @config           = config ? config.reject{ |k,v| k == 'auto_upgrade' || k == 'versions' } : nil
-      @upgrade          = opts.has_key?('upgrade')      ? opts['upgrade']         : false
-      @git_client       = opts.has_key?('git_client')   ? opts['git_client'].dup  : nil
-      @verbose          = opts.has_key?('verbose')      ? opts['verbose']         : false
+      @upgrade          = opts.has_key?(:upgrade)      ? opts[:upgrade]         : false
+      @git_client       = opts.has_key?(:git_client)   ? opts[:git_client].dup  : nil
+      @verbose          = opts.has_key?(:verbose)      ? opts[:verbose]         : false
       check_updates if @auto_upgrade && @upgrade
     end
 
