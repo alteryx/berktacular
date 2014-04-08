@@ -1,6 +1,27 @@
 module Berktacular
+
+  # This class represents a cookbook entry form a Berksfile
+
   class Cookbook
+
+    # @!attribute [r] name
+    #   @return [String] the name of the cookbook.
+    # @!attribute [r] version_number
+    #   @return [String] the exact version of the cookbook.
+    # @!attribute [r] auto_upgrade
+    #   @return [True, False] whether or now this cookbook can autoupgrade.
+    # @!attribute [r] config
+    #   @return [Hash, nil] the cookbook_location hash associated with this cookbook or nil
     attr_reader :name, :version_number, :auto_upgrade, :config
+
+    # Creates a new cookbook entry for a Berksfile.
+    #
+    # @param name [String] the name of the cookbook to use.
+    # @param version_spec [String] the exact version number as in a chef environment file. eg. '= 1.2.3'
+    # @param config [Hash,nil] the cookbook_location hash to for this cookbook.  Optional.
+    # @option opts [Octokit::Client] :git_client (nil) the github client to use.
+    # @option opts [True,False] :upgrade (False) whether or not to check for updates.  auto_upgrade must also be enbaled for the updated entry to be used.
+    # @option opts [True,False] :verbose (False) be more vervose.
     def initialize( name, version_spec, config = nil, opts = {} )
       @name             = name          || raise( "Missing cookbook name" )
       @version_spec     = version_spec  || raise( "Missing cookbook version" )
@@ -15,22 +36,28 @@ module Berktacular
       check_updates if @auto_upgrade && @upgrade
     end
 
+    # @return [String] the exact version of the cookbook
     def version_specifier
       "= #{(@auto_upgrade && @upgrade && check_updates.any?) ? check_updates.first : @version_number }"
     end
 
+    # @return [String] the latest available version number of the cookbook
     def latest_version
       check_updates.any? ? check_updates.first : @version_number
     end
 
+    # @return [String] a Berksfile line for this cookbook
     def to_s
       line
     end
 
+    # param upgrade [True,False] ('@upgrade') whether or not to force the lastest version when @auto_update is enabled
+    # @return [String] a Berksfile line for this cookbook
     def line(upgrade = @upgrade)
       "cookbook \"#{@name}\", #{generate_conf_line(upgrade, @config )}"
     end
 
+    # @return [Array] a list of available cookbook version newer then we started with, with most recent first
     def check_updates
       @candidates ||= if @config && @config['github']
         get_tags_from_github
