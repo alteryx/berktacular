@@ -16,7 +16,7 @@ task :build do
 end
 
 task :release do
-  system "echo gem push berktacular-#{Berktacular::VERSION}.gem"
+  system "gem push berktacular-#{Berktacular::VERSION}.gem"
 end
 
 desc "Run tests"

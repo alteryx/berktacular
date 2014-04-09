@@ -190,8 +190,9 @@ module Berktacular
     # @return [Octokit::Client] a connected github client.
     def connect_to_git
       raise "No token given, can't connect to git" unless @opts[:github_token]
+      puts "Connecting to git with supplied github_token" if @opts[:verbose]
       require 'octokit'
-      @opts['git_client'] ||= Octokit::Client.new(access_token: @opts[:github_token])      
+      @opts[:git_client] ||= Octokit::Client.new(access_token: @opts[:github_token])
     end
 
   end

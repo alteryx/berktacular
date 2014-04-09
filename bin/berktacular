@@ -17,7 +17,8 @@ verify      = nil
 upload      = false
 berks_conf  = nil
 knife_conf  = nil
-workdir     = nil 
+workdir     = nil
+verbose     = false
 
 options =  OptionParser.new do |opts|
   opts.banner = "Read environment json file and spit out a berksfile"
@@ -64,6 +65,9 @@ options =  OptionParser.new do |opts|
                                               "Default is a tmpdir somewhere (probably /tmp or /dev/shm)") do |w|
     workdir = w
     preserve = true
+  end
+  opts.on("-v", "--verbose", "Turn on verbose output" ) do
+    verbose = true
   end
   opts.on_tail("-h", "--help", "Print this help message" ) do
     puts opts
@@ -117,7 +121,7 @@ end
 
 # Create a new berksfile
 puts "Checking updates, this can take some time..." if check || upgrade
-b = Berktacular::Berksfile.new(my_env, upgrade: upgrade, github_token: github_token)
+b = Berktacular::Berksfile.new(my_env, upgrade: upgrade, github_token: github_token, verbose: verbose)
 b.check_updates           if check
 puts "#{b}"               if printit
 if berksfile
