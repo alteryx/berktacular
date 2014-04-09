@@ -1,0 +1,10 @@
+# Name: 'berktacular'
+# Description: Berktacular test environment
+
+# This file is auto-generated, changes will be overwritten
+# Modify the .json version of this file to make changes
+
+site :opscode
+
+cookbook "lumberjack", github: "hectcastro/chef-lumberjack", protocol: :ssh, ref: "314a5736f0a7ea044a346463f9a431620dc59f25"
+cookbook "postgresql",  "3.4.3"

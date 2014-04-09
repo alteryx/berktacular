@@ -1,3 +1,4 @@
 module Berktacular
-  VERSION = '0.1.0'
+  # the gem version.
+  VERSION = '0.1.2'
 end
