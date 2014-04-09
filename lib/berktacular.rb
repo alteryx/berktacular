@@ -19,6 +19,7 @@ module Berktacular
     unless system(cmd)
       raise "Command failed with exit code #{$?.exitstatus}: #{cmd}"
     end
+    true
   end
 
   # @return [String] the best tmpdir to use for this machine.  Prefers /dev/shm if available.
@@ -36,7 +37,7 @@ module Berktacular
     Dir.mktmpdir(pat, tmp)
   end
 
-  # Matches the numric version information from a tag.
+  # Matches the numeric version information from a tag.
   VERSION_RE = Regexp.new(/\d+(?:\.\d+)*/)
 
   autoload  :Cookbook,  'berktacular/cookbook'

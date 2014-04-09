@@ -76,7 +76,7 @@ module Berktacular
       workdir
     end
 
-    # @params workdir [String] the directory in which to install.  If nill, Berktacular.best_temp_dir is used.
+    # @params workdir [String] the directory in which to install.  If nil, Berktacular.best_temp_dir is used.
     # @return [True,False] the status of the verify.
     def verify(workdir = nil)
       require 'ridley'

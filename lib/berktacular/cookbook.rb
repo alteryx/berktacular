@@ -20,8 +20,8 @@ module Berktacular
     # @param version_spec [String] the exact version number as in a chef environment file. eg. '= 1.2.3'
     # @param config [Hash,nil] the cookbook_location hash to for this cookbook.  Optional.
     # @option opts [Octokit::Client] :git_client (nil) the github client to use.
-    # @option opts [True,False] :upgrade (False) whether or not to check for updates.  auto_upgrade must also be enbaled for the updated entry to be used.
-    # @option opts [True,False] :verbose (False) be more vervose.
+    # @option opts [True,False] :upgrade (False) whether or not to check for updates.  auto_upgrade must also be enabled for the updated entry to be used.
+    # @option opts [True,False] :verbose (False) be more verbose.
     def initialize( name, version_spec, config = nil, opts = {} )
       @name             = name          || raise( "Missing cookbook name" )
       @version_spec     = version_spec  || raise( "Missing cookbook version" )
