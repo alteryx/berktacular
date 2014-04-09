@@ -78,7 +78,10 @@ module Berktacular
     end
 
     private
-
+    
+    # @param upgrade [True,False] use updated cookbook version if @auto_update is also true.
+    # @param config [Hash] the cookbook_locations hash associated with this cookbook.
+    # @return [String] the config line for this cookbook, everything after the cookbook name.
     def generate_conf_line(upgrade, config)
       ver = (upgrade && @candidates && @candiates.first) || @version_number
       line = []
@@ -102,7 +105,8 @@ module Berktacular
       end
       line.join(", ").gsub('%{version}', ver)
     end
-
+    
+    # return [Array] a list of tags from the github repository of this cookbook.
     def get_tags_from_github
       @git_client.repo(@config['github']).rels[:tags].get.data.map { |obj| obj.name }
     end

@@ -109,7 +109,7 @@ if upload
   end
   knife_conf ||= "#{File.join(ENV['HOME'], File.basename(env_file, ".json") + "-knife.rb" )}"
   unless File.exists? knife_conf
-    warn "The berkshelf config file could not be found at '#{knife_conf}'"
+    warn "The knife config file could not be found at '#{knife_conf}'"
     warn options
     exit 5
   end
