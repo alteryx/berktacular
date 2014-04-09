@@ -27,9 +27,9 @@ module Berktacular
       @cookbook_versions  = environment['cookbook_versions']  || {}
       @cookbook_locations = environment['cookbook_locations'] || {}
       @opts = {
-        :upgrade => opts.has_key?(:upgrade)       ? opts[:upgrade]      : false,
-        :token   => opts.has_key?(:github_token)  ? opts[:github_token] : nil,
-        :verbose => opts.has_key?(:verbose)       ? opts[:verbose]      : false
+        :upgrade      => opts.has_key?(:upgrade)      ? opts[:upgrade]      : false,
+        :github_token => opts.has_key?(:github_token) ? opts[:github_token] : nil,
+        :verbose      => opts.has_key?(:verbose)      ? opts[:verbose]      : false
       }
       @installed = {}
       # only connect once, pass the client to each cookbook.  and only if needed

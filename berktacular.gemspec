@@ -2,7 +2,7 @@ lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 require 'berktacular/version'
 
-Gem::Specification.new do |s|
+spec = Gem::Specification.new do |s|
   s.name        = 'berktacular'
   s.version     = Berktacular::VERSION
   s.date        = Time.now.strftime('%Y-%m-%d')
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'ridley',  '~> 1.5', '>= 1.5.3'
   s.add_dependency 'octokit', '~> 3.0', '>= 3.0.0'
 
-  s.files       = Dir["./lib/**/**"] + Dir["./bin/*"]
+  s.files       = Dir["{bin,lib}/**/*"]
   s.executables << 'berktacular'
   s.homepage    = 'https://rubygems.org/gems/berktacular'
   s.licenses    = ['Apache License, Version 2.0']

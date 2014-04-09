@@ -1,7 +1,7 @@
-require 'test/unit'
+require 'minitest/autorun'
 require 'berktacular'
 
-class BerktacularTest < Test::Unit::TestCase
+class BerktacularTest < Minitest::Unit::TestCase
   
   def setup
     g = File.join(ENV['HOME'], '.github-token')
@@ -14,12 +14,15 @@ class BerktacularTest < Test::Unit::TestCase
     unless File.exists?(e)
       puts "Where is e?"
     end
-    @berksfile = Berktacular::Berksfile.new("./test/test_env.json", {token: t} )
+    @berksfile = Berktacular::Berksfile.new( JSON.parse(File.read(e)), upgrade: false, token: t )
     puts "#{@berksfile}"
     @golden = File.read("test/golden.sample")
   end
 
   def test_can_generate_berksfile
-    assert_equal @golden, @berksfile.to_s
+    require "pp"
+    pp @berksfile
+    puts "#{@berksfile}"
+    assert_equal "#{@golden}", "#{@berksfile}"
   end
 end

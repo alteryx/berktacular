@@ -4,7 +4,7 @@
   "chef_type": "environment",
   "json_class": "Chef::Environment",
   "cookbook_versions": {
-    "postgresql": "= 3.4.3",
+    "postgresql": "= 3.3.4",
     "lumberjack": "= 0.1.2"
   },
   "cookbook_locations": {

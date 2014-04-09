@@ -92,7 +92,7 @@ my_env = JSON.parse( File.read( env_file ) )
 
 unless github_token
   if File.exists? gtoken_path
-    github_token = IO.read(token_path).strip
+    github_token = IO.read(gtoken_path).strip
   elsif upgrade || check
     warn "No github token, cannot continue"
     warn options
