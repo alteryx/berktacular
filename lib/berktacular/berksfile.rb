@@ -68,10 +68,12 @@ module Berktacular
         # remove the Berksfile.lock if it exists (it shouldn't).
         berksfile = File.join(workdir, "Berksfile")
         lck       = berksfile + ".lock"
+        cookbooks = File.join(workdir, "cookbooks")
         FileUtils.rm(lck) if File.exists? lck
         File.write(berksfile, self)
-        Berktacular.run_command("berks install --berksfile #{berksfile} --path #{workdir}")
-        @installed[workdir] = {berksfile: berksfile, lck: lck}
+        Berktacular.run_command("berks install --berksfile #{berksfile} --path #{cookbooks}")
+        system "ls #{workdir}"
+        @installed[workdir] = {berksfile: berksfile, lck: lck, cookbooks: cookbooks}
       end
       workdir
     end
@@ -84,7 +86,7 @@ module Berktacular
       workdir       = install(workdir)
       versions      = {}
       dependencies  = {}
-      Dir["#{workdir}/*"].each do |cookbook_dir|
+      Dir["#{@installed[workdir][:cookbooks]}/*"].each do |cookbook_dir|
         next unless File.directory?(cookbook_dir)
         metadata_path   = File.join(cookbook_dir, 'metadata.rb')
         metadata        = Ridley::Chef::Cookbook::Metadata.from_file(metadata_path)
@@ -130,8 +132,9 @@ module Berktacular
       raise "No berks config, required for upload" unless berks_conf && File.exists?(berks_conf)
       raise "No knife config, required for upload" unless knife_conf && File.exists?(knife_conf)
       workdir       = install(workdir)
-      new_env_file  = File.write(File.join(workdir, @name + ".rb"), env_file_json )
-      Berktacular.run_command("berks upload --berksfile #{@installed[workdir][:berksfile]} --c #{berks_conf}")
+      new_env_file  = File.join(workdir, @name + ".json")
+      File.write(new_env_file, env_file_json)
+      Berktacular.run_command("berks upload --berksfile #{@installed[workdir][:berksfile]} -c #{berks_conf}")
       Berktacular.run_command("knife environment from file #{new_env_file} -c #{knife_conf}")
     end
 
