@@ -72,7 +72,6 @@ module Berktacular
         FileUtils.rm(lck) if File.exists? lck
         File.write(berksfile, self)
         Berktacular.run_command("berks install --berksfile #{berksfile} --path #{cookbooks}")
-        system "ls #{workdir}"
         @installed[workdir] = {berksfile: berksfile, lck: lck, cookbooks: cookbooks}
       end
       workdir
