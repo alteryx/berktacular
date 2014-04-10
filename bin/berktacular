@@ -69,6 +69,10 @@ options =  OptionParser.new do |opts|
   opts.on("-v", "--verbose", "Turn on verbose output" ) do
     verbose = true
   end
+  opts.on("--version", "Print the version and exit" ) do
+    puts Berktacular::VERSION
+    exit 0
+  end
   opts.on_tail("-h", "--help", "Print this help message" ) do
     puts opts
     exit 0
