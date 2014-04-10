@@ -69,6 +69,10 @@ options =  OptionParser.new do |opts|
   opts.on("-v", "--verbose", "Turn on verbose output" ) do
     verbose = true
   end
+  opts.on("--version", "Print the version and exit" ) do
+    puts Berktacular::VERSION
+    exit 0
+  end
   opts.on_tail("-h", "--help", "Print this help message" ) do
     puts opts
     exit 0
@@ -81,7 +85,7 @@ options =  OptionParser.new do |opts|
   end
 end
 # Enable verify by default if uploading, unless the user has surpressed it.
-verify ||= upload
+verify = upload if verify.nil?
 
 require 'json'
 require 'solve'
@@ -105,19 +109,23 @@ unless github_token
 end
 
 if upload
-  berks_conf ||= "#{File.join(ENV['HOME'], File.basename(env_file, ".json") + "-berkshelf.json" )}"
+  berks_conf ||= "#{File.join(ENV['HOME'], '.chef' , File.basename(env_file, ".json") + "-berkshelf.json" )}"
   unless File.exists? berks_conf
     warn "The berkshelf config file could not be found at '#{berks_conf}'"
     warn options
     exit 4
   end
-  knife_conf ||= "#{File.join(ENV['HOME'], File.basename(env_file, ".json") + "-knife.rb" )}"
+  knife_conf ||= "#{File.join(ENV['HOME'], '.chef' , File.basename(env_file, ".json") + "-knife.rb" )}"
   unless File.exists? knife_conf
     warn "The knife config file could not be found at '#{knife_conf}'"
     warn options
     exit 5
   end
 end
+
+# We have to set our work dir now or berktacular will give us a new one each time we pass in nil.
+workdir = Berktacular.best_temp_dir unless workdir
+puts "Using workdir: '#{workdir}'" if verbose
 
 # Create a new berksfile
 puts "Checking updates, this can take some time..." if check || upgrade
@@ -145,7 +153,7 @@ if verify
 end
 
 if upload
-  unless b.upload(knife_conf, workdir)
+  unless b.upload(berks_conf, knife_conf, workdir)
     puts "Upload failed!"
     exit 11
   end
