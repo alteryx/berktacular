@@ -12,7 +12,7 @@ spec = Gem::Specification.new do |s|
   s.authors     = ['Jeff Harvey-Smith']
   s.email       = ['jeff@clearstorydata.com']
 
-  s.required_ruby_version = '~> 1.9'
+  s.required_ruby_version = '>= 1.9'
 
   s.add_dependency 'solve',   '~> 0.8', '>= 0.8.2'
   s.add_dependency 'ridley',  '~> 1.5', '>= 1.5.3'
