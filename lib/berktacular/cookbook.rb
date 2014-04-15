@@ -83,7 +83,7 @@ module Berktacular
     # @param config [Hash] the cookbook_locations hash associated with this cookbook.
     # @return [String] the config line for this cookbook, everything after the cookbook name.
     def generate_conf_line(upgrade, config)
-      ver = (upgrade && @candidates && @candiates.first) || @version_number
+      ver = (upgrade && @candidates && @candidates.first) || @version_number
       line = []
       if config
         if config.has_key?('github')
