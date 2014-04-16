@@ -63,7 +63,7 @@ module Berktacular
         get_tags_from_github
       else
         []
-      end.select do |tag|
+      end.collect do |tag|
         next if @config.has_key?('rel') && ! /^#{@name}-[v\d]/.match(tag)
         m = VERSION_RE.match(tag)
         next unless m
@@ -73,8 +73,9 @@ module Berktacular
         rescue Solve::Errors::InvalidVersionFormat
           next
         end
-        t > @version_solved
-      end.sort.reverse
+        next unless t > @version_solved
+        t.to_s
+      end.compact.sort.reverse
     end
 
     private

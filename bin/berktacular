@@ -84,7 +84,7 @@ options =  OptionParser.new do |opts|
     exit 1
   end
 end
-# Enable verify by default if uploading, unless the user has surpressed it.
+# Enable verify by default if uploading, unless the user has suppressed it.
 verify = upload if verify.nil?
 
 require 'json'
