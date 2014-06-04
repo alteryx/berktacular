@@ -16,7 +16,10 @@ spec = Gem::Specification.new do |s|
 
   s.add_dependency 'solve',   '~> 0.8', '>= 0.8.2'
   s.add_dependency 'ridley',  '~> 1.5', '>= 1.5.3'
+  s.add_dependency 'faraday', '~> 0.8.9'
   s.add_dependency 'octokit', '~> 3.0', '>= 3.0.0'
+  s.add_dependency 'hashie',  '< 3.0.0'
+  s.add_dependency 'berkshelf', '< 3.0.0'
 
   s.files       = Dir["{bin,lib}/**/*"]
   s.executables << 'berktacular'
