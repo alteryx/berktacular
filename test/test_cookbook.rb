@@ -1,9 +1,10 @@
+require 'minitest'
 require 'minitest/autorun'
 require 'berktacular'
 require 'json'
 require 'solve'
 
-class BerktacularTest < Minitest::Unit::TestCase
+class BerktacularTest < Minitest::Test
   def setup
     e = "./test/test_env.json"
     unless File.exists?(e)
@@ -28,6 +29,6 @@ class BerktacularTest < Minitest::Unit::TestCase
       @env['cookbook_versions'][b],
       @env['cookbook_locations'][b]
     )
-    assert_equal 'cookbook "lumberjack", github: "hectcastro/chef-lumberjack", protocol: :ssh, ref: "314a5736f0a7ea044a346463f9a431620dc59f25"', c.to_s
+    assert_equal 'cookbook "lumberjack", git: "git@github.com:hectcastro/chef-lumberjack.git", protocol: :ssh, ref: "314a5736f0a7ea044a346463f9a431620dc59f25"', c.to_s
   end
 end

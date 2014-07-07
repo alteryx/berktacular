@@ -1,8 +1,9 @@
+require 'minitest'
 require 'minitest/autorun'
 require 'berktacular'
 
-class BerktacularTest < Minitest::Unit::TestCase
-  
+class BerktacularTest < Minitest::Test
+
   def setup
     begin
       t = ENV['GITHUB_TOKEN'] || File.read( File.join(ENV['HOME'], '.github-token') ).strip

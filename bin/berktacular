@@ -19,6 +19,7 @@ berks_conf  = nil
 knife_conf  = nil
 workdir     = nil
 verbose     = false
+source_list = []
 
 options =  OptionParser.new do |opts|
   opts.banner = "Read environment json file and spit out a berksfile"
@@ -65,6 +66,11 @@ options =  OptionParser.new do |opts|
                                               "Default is a tmpdir somewhere (probably /tmp or /dev/shm)") do |w|
     workdir = w
     preserve = true
+  end
+  opts.on("-s", "--source SOURCE", String,
+    "Add this source to the generated Berksfile in addition to the default source, " +
+    "'https://api.berkshelf.com'. This may be e.g. an internal Berkshelf API server URL.") do |s|
+    source_list << s
   end
   opts.on("-v", "--verbose", "Turn on verbose output" ) do
     verbose = true
@@ -129,9 +135,15 @@ puts "Using workdir: '#{workdir}'" if verbose
 
 # Create a new berksfile
 puts "Checking updates, this can take some time..." if check || upgrade
-b = Berktacular::Berksfile.new(my_env, upgrade: upgrade, github_token: github_token, verbose: verbose)
-b.check_updates           if check
-puts "#{b}"               if printit
+b = Berktacular::Berksfile.new(
+  my_env,
+  upgrade: upgrade,
+  github_token: github_token,
+  verbose: verbose,
+  source_list: source_list
+)
+b.check_updates if check
+puts "#{b}" if printit
 if berksfile
   FileUtils.mkdir_p( File.dirname(berksfile) )
   File.write(berksfile, b)

@@ -4,6 +4,8 @@ require 'yard'
 require "bundler/version"
 require "berktacular/version"
 
+Bundler::GemHelper.install_tasks
+
 Rake::TestTask.new do |t|
   t.libs << 'test'
 end
