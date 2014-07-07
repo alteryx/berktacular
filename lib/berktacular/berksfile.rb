@@ -40,7 +40,7 @@ module Berktacular
       @installed = {}
       # only connect once, pass the client to each cookbook.  and only if needed
       connect_to_git if @opts[:upgrade]
-      @opts[:source_list] = (["https://api.berkshelf.com"] + @opts[:source_list]).uniq
+      @opts[:source_list] = (@opts[:source_list] + ["https://api.berkshelf.com"]).uniq
     end
 
     # @return [Hash] representation of the env_file.

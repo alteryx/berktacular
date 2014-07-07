@@ -1,8 +1,10 @@
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
+
 require 'rake/testtask'
 require 'yard'
-require "bundler/version"
-require "berktacular/version"
+require 'bundler'
+require 'bundler/version'
+require 'berktacular/version'
 
 Bundler::GemHelper.install_tasks
 
