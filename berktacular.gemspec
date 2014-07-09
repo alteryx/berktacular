@@ -23,7 +23,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'yard', '~> 0.8'
   s.add_development_dependency 'minitest', '~> 5.3'
 
-  s.files       = Dir["{bin,lib}/**/*"]
+  s.files       = Dir["{bin,lib}/**/*"] + ['VERSION']
   s.executables << 'berktacular'
   s.homepage    = 'https://rubygems.org/gems/berktacular'
   s.licenses    = ['Apache License, Version 2.0']
