@@ -1,3 +1,6 @@
+require 'ostruct'
+require 'json'
+
 module Berktacular
 
   # This class represents a Berksfile
@@ -20,6 +23,8 @@ module Berktacular
     # @option opts [String] :github_token (nil) the github token to use.
     # @option opts [True,False] :upgrade (False) whether or not to check for upgraded cookbooks.
     # @option opts [True,False] :verbose (False) be more verbose.
+    # @option opts [Array<String>] :source_list additional Berkshelf API sources to include in the
+    #   generated Berksfile.
     def initialize( environment, opts = {})
       @env_hash           = environment # Save the whole thing so we can emit an updated version if needed.
       @name               = environment['name']               || nil
@@ -29,11 +34,13 @@ module Berktacular
       @opts = {
         :upgrade      => opts.has_key?(:upgrade)      ? opts[:upgrade]      : false,
         :github_token => opts.has_key?(:github_token) ? opts[:github_token] : nil,
-        :verbose      => opts.has_key?(:verbose)      ? opts[:verbose]      : false
+        :verbose      => opts.has_key?(:verbose)      ? opts[:verbose]      : false,
+        :source_list  => opts.has_key?(:source_list)  ? opts[:source_list]  : []
       }
       @installed = {}
       # only connect once, pass the client to each cookbook.  and only if needed
       connect_to_git if @opts[:upgrade]
+      @opts[:source_list] = (@opts[:source_list] + ["https://api.berkshelf.com"]).uniq
     end
 
     # @return [Hash] representation of the env_file.
@@ -71,7 +78,7 @@ module Berktacular
         cookbooks = File.join(workdir, "cookbooks")
         FileUtils.rm(lck) if File.exists? lck
         File.write(berksfile, self)
-        Berktacular.run_command("berks install --berksfile #{berksfile} --path #{cookbooks}")
+        Berktacular.run_command("berks vendor --berksfile #{berksfile} #{cookbooks}")
         @installed[workdir] = {berksfile: berksfile, lck: lck, cookbooks: cookbooks}
       end
       workdir
@@ -87,10 +94,14 @@ module Berktacular
       dependencies  = {}
       Dir["#{@installed[workdir][:cookbooks]}/*"].each do |cookbook_dir|
         next unless File.directory?(cookbook_dir)
-        metadata_path   = File.join(cookbook_dir, 'metadata.rb')
-        metadata        = Ridley::Chef::Cookbook::Metadata.from_file(metadata_path)
-        cookbook_name   = metadata.name
-        name_from_path  = File.basename(cookbook_dir)
+        metadata_candidates = ['rb', 'json'].map {|ext| File.join(cookbook_dir, "metadata.#{ext}") }
+        metadata_path = metadata_candidates.find {|f| File.exists?(f) }
+        raise "Metadata file not found: #{metadata_candidates}" if metadata_path.nil?
+        metadata =
+          metadata_path =~ /\.json$/ ? metadata_from_json(IO.read(metadata_path)) :
+            Ridley::Chef::Cookbook::Metadata.from_file(metadata_path)
+        cookbook_name = metadata.name
+        name_from_path = File.basename(cookbook_dir)
         unless cookbook_name == name_from_path
           if cookbook_name.empty?
             puts "Cookbook #{name_from_path} has no name specified in metadata.rb"
@@ -112,14 +123,24 @@ module Berktacular
             @missing_deps[name] = "#{name}-#{versions[name]} depends on #{dep_name} which was not installed!"
             warn @missing_deps[name]
             errors = true
-          elsif !Solve::Constraint.new(constraint).satisfies?(actual_version)
-            @missing_deps[name] = "#{name}-#{versions[name]} depends on #{dep_name} #{constraint} but #{dep_name} is #{actual_version}!"
-            warn @missing_deps[name]
-            errors = true
+          elsif constraint != []  # some cookbooks have '[]' as a dependency in their json metadata
+            constraint_obj = begin
+              Semverse::Constraint.new(constraint)
+            rescue Semverse::InvalidConstraintFormat => ex
+              warn "Could not parse version constraint '#{constraint}' " +
+                   "for dependency '#{dep_name}' of cookbook '#{name}'"
+              raise ex
+            end
+
+            unless constraint_obj.satisfies?(actual_version)
+              @missing_deps[name] = "#{name}-#{versions[name]} depends on #{dep_name} #{constraint} but #{dep_name} is #{actual_version}!"
+              warn @missing_deps[name]
+              errors = true
+            end
           end
         end
       end
-      !errors  
+      !errors
     end
 
     # @param berks_conf [String] path to the berkshelf config file to use.
@@ -151,7 +172,7 @@ module Berktacular
 
     # @param [IO] where to write the data.
     def print_berksfile( io = STDOUT )
-      io.puts to_s  
+      io.puts to_s
     end
 
     # @return [String] the berksfile as a String object
@@ -162,7 +183,10 @@ module Berktacular
       str << "# This file is auto-generated, changes will be overwritten\n"
       str << "# Modify the .json environment file and regenerate this Berksfile to make changes.\n\n"
 
-      str << "site :opscode\n\n"
+      @opts[:source_list].each do |source_url|
+        str << "source '#{source_url}'\n"
+      end
+      str << "\n"
       cookbooks.each { |l| str << l.to_s << "\n" }
       str
     end
@@ -170,7 +194,7 @@ module Berktacular
     # @return [Array] a list of Cookbook objects for this environment.
     def cookbooks
       @cookbooks ||= @cookbook_versions.sort.map do |book, version|
-        Cookbook.new(book, version, @cookbook_locations[book], @opts ) 
+        Cookbook.new(book, version, @cookbook_locations[book], @opts )
       end
     end
 
@@ -195,6 +219,10 @@ module Berktacular
       puts "Connecting to git with supplied github_token" if @opts[:verbose]
       require 'octokit'
       @opts[:git_client] ||= Octokit::Client.new(access_token: @opts[:github_token])
+    end
+
+    def metadata_from_json(json_str)
+      OpenStruct.new(JSON.parse(json_str))
     end
 
   end

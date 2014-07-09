@@ -14,14 +14,16 @@ spec = Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 1.9'
 
-  s.add_dependency 'solve',   '~> 0.8', '>= 0.8.2'
-  s.add_dependency 'ridley',  '~> 1.5', '>= 1.5.3'
-  s.add_dependency 'faraday', '~> 0.8.9'
+  s.add_dependency 'solve', '~> 1.2'
+  s.add_dependency 'ridley',  '~> 4.0'
+  s.add_dependency 'faraday', '~> 0.9'
   s.add_dependency 'octokit', '~> 3.0', '>= 3.0.0'
-  s.add_dependency 'hashie',  '< 3.0.0'
-  s.add_dependency 'berkshelf', '< 3.0.0'
+  s.add_dependency 'hashie', '~> 2.1'
+  s.add_dependency 'berkshelf', '~> 3.1'
+  s.add_development_dependency 'yard', '~> 0.8'
+  s.add_development_dependency 'minitest', '~> 5.3'
 
-  s.files       = Dir["{bin,lib}/**/*"]
+  s.files       = Dir["{bin,lib}/**/*"] + ['VERSION']
   s.executables << 'berktacular'
   s.homepage    = 'https://rubygems.org/gems/berktacular'
   s.licenses    = ['Apache License, Version 2.0']

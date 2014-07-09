@@ -19,6 +19,8 @@ berks_conf  = nil
 knife_conf  = nil
 workdir     = nil
 verbose     = false
+source_list = []
+versions_only = false
 
 options =  OptionParser.new do |opts|
   opts.banner = "Read environment json file and spit out a berksfile"
@@ -66,8 +68,20 @@ options =  OptionParser.new do |opts|
     workdir = w
     preserve = true
   end
+  opts.on("-s", "--source SOURCE", String,
+    "Add this source to the generated Berksfile in addition to the default source",
+    "(https://api.berkshelf.com). This may be e.g. an internal Berkshelf API server URL.",
+    "This option can be used multiple times. Custom sources are always included before the ",
+    "default source, unless the default source is explicitly specified using this option.") do |s|
+    source_list << s
+  end
   opts.on("-v", "--verbose", "Turn on verbose output" ) do
     verbose = true
+  end
+  opts.on("--versions-only",
+    "Include only cookbook versions in the Berksfile (no protocol or git URL).",
+    "This can be used with --source to download cookbooks using an API server.") do
+    versions_only = true
   end
   opts.on("--version", "Print the version and exit" ) do
     puts Berktacular::VERSION
@@ -97,6 +111,10 @@ unless env_file && File.exist?(env_file)
 end
 
 my_env = JSON.parse( File.read( env_file ) )
+if versions_only
+  # Ignore cookbook locations. Only include versions in the generated Berksfile.
+  my_env.delete('cookbook_locations')
+end
 
 unless github_token
   if File.exists? gtoken_path
@@ -129,9 +147,15 @@ puts "Using workdir: '#{workdir}'" if verbose
 
 # Create a new berksfile
 puts "Checking updates, this can take some time..." if check || upgrade
-b = Berktacular::Berksfile.new(my_env, upgrade: upgrade, github_token: github_token, verbose: verbose)
-b.check_updates           if check
-puts "#{b}"               if printit
+b = Berktacular::Berksfile.new(
+  my_env,
+  upgrade: upgrade,
+  github_token: github_token,
+  verbose: verbose,
+  source_list: source_list
+)
+b.check_updates if check
+puts "#{b}" if printit
 if berksfile
   FileUtils.mkdir_p( File.dirname(berksfile) )
   File.write(berksfile, b)

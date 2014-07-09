@@ -1,4 +1,4 @@
 module Berktacular
   # the gem version.
-  VERSION = '0.1.7'
+  VERSION = IO.read(File.expand_path('../../../VERSION', __FILE__)).strip
 end

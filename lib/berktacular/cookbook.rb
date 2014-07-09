@@ -1,3 +1,5 @@
+require 'semverse'
+
 module Berktacular
 
   # This class represents a cookbook entry form a Berksfile
@@ -26,7 +28,7 @@ module Berktacular
       @name             = name          || raise( "Missing cookbook name" )
       @version_spec     = version_spec  || raise( "Missing cookbook version" )
       @version_number   = VERSION_RE.match( version_spec )[0]
-      @version_solved   = Solve::Version.new(@version_number)
+      @version_solved   = Semverse::Version.new(@version_number)
       @auto_upgrade     = config && config['auto_upgrade']  || false
       @versions         = config && config['versions']      || {}
       @config           = config ? config.reject{ |k,v| k == 'auto_upgrade' || k == 'versions' } : nil
@@ -69,8 +71,8 @@ module Berktacular
         next unless m
         v = m[0]
         begin
-          t = Solve::Version.new(v)
-        rescue Solve::Errors::InvalidVersionFormat
+          t = Semverse::Version.new(v)
+        rescue Semverse::InvalidVersionFormat
           next
         end
         next unless t > @version_solved
@@ -79,7 +81,7 @@ module Berktacular
     end
 
     private
-    
+
     # @param upgrade [True,False] use updated cookbook version if @auto_update is also true.
     # @param config [Hash] the cookbook_locations hash associated with this cookbook.
     # @return [String] the config line for this cookbook, everything after the cookbook name.
@@ -88,7 +90,7 @@ module Berktacular
       line = []
       if config
         if config.has_key?('github')
-          line << "github: \"#{config['github']}\""
+          line << "git: \"git@github.com:#{config['github']}.git\""
           line << "rel: \"#{config['rel']}\"" if config.has_key?('rel')
           line << 'protocol: :ssh'
         end
@@ -106,7 +108,7 @@ module Berktacular
       end
       line.join(", ").gsub('%{version}', ver)
     end
-    
+
     # return [Array] a list of tags from the github repository of this cookbook.
     def get_tags_from_github
       @git_client.repo(@config['github']).rels[:tags].get.data.map { |obj| obj.name }
