@@ -69,9 +69,10 @@ options =  OptionParser.new do |opts|
     preserve = true
   end
   opts.on("-s", "--source SOURCE", String,
-    "Add this source to the generated Berksfile in addition to the default source,",
-    "'https://api.berkshelf.com'. This may be e.g. an internal Berkshelf API server URL.",
-    "Custom sources are always included before the default source.") do |s|
+    "Add this source to the generated Berksfile in addition to the default source",
+    "(https://api.berkshelf.com). This may be e.g. an internal Berkshelf API server URL.",
+    "This option can be used multiple times. Custom sources are always included before the ",
+    "default source, unless the default source is explicitly specified using this option.") do |s|
     source_list << s
   end
   opts.on("-v", "--verbose", "Turn on verbose output" ) do
