@@ -61,15 +61,17 @@ module Berktacular
 
     # @return [Array] a list of available cookbook version newer then we started with, with most recent first
     def check_updates
+      tag_re = Regexp.new(
+        "^#{ (@config || {})['tag'] || '%{version}' }$" % { :version => "(#{VERSION_RE.source})" }
+      )
       @candidates ||= if @config && @config['github']
         get_tags_from_github
       else
         []
       end.collect do |tag|
-        next if @config.has_key?('rel') && ! /^#{@name}-[v\d]/.match(tag)
-        m = VERSION_RE.match(tag)
+        m = tag_re.match(tag)
         next unless m
-        v = m[0]
+        v = m[1]
         begin
           t = Semverse::Version.new(v)
         rescue Semverse::InvalidVersionFormat
@@ -111,7 +113,12 @@ module Berktacular
 
     # return [Array] a list of tags from the github repository of this cookbook.
     def get_tags_from_github
-      @git_client.repo(@config['github']).rels[:tags].get.data.map { |obj| obj.name }
+      @@tags_cache ||= {}
+      repo_path = @config['github']
+      return @@tags_cache[repo_path] if @@tags_cache[repo_path]
+      tags = @git_client.tags(@config['github']).map { |obj| obj.name }
+      @@tags_cache[repo_path] = tags
+      tags
     end
 
   end
