@@ -205,7 +205,7 @@ module Berktacular
         candidates = b.check_updates
         next unless candidates.any?
         puts  "Cookbook: #{b.name} (auto upgrade: #{b.auto_upgrade ? 'enabled' : 'disabled'})",
-              "\tCurrent:#{b.version_number}",
+              "\tCurrent: #{b.version_number}",
               "\tUpdates: #{candidates.join(", ")}"
       end
     end
@@ -218,7 +218,10 @@ module Berktacular
       raise "No token given, can't connect to git" unless @opts[:github_token]
       puts "Connecting to git with supplied github_token" if @opts[:verbose]
       require 'octokit'
-      @opts[:git_client] ||= Octokit::Client.new(access_token: @opts[:github_token])
+      @opts[:git_client] ||= Octokit::Client.new(
+        access_token: @opts[:github_token],
+        auto_paginate: true
+      )
     end
 
     def metadata_from_json(json_str)
