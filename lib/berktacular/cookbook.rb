@@ -98,10 +98,7 @@ module Berktacular
         if config.has_key?('rel') && @multi_cookbook_dir
           local_cookbook_dir = File.join(@multi_cookbook_dir, config['rel'])
           if Dir.exists?(local_cookbook_dir)
-            metadata_path_prefix = File.join(local_cookbook_dir, 'metadata')
-            metadata_path = ['rb', 'json'].map {|ext| "#{metadata_path_prefix}.#{ext}" }.find do |f|
-              File.exists?(f)
-            end
+            metadata_path = Dir["#{File.join(local_cookbook_dir, 'metadata')}.{rb,json}"].first
             if metadata_path
               metadata = Ridley::Chef::Cookbook::Metadata.from_file(metadata_path)
               if metadata.version == ver
