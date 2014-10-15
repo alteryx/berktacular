@@ -1,8 +1,9 @@
 require 'semverse'
+require 'ridley'
 
 module Berktacular
 
-  # This class represents a cookbook entry form a Berksfile
+  # This class represents a cookbook entry from a Berksfile
 
   class Cookbook
 
@@ -35,6 +36,7 @@ module Berktacular
       @upgrade          = opts.has_key?(:upgrade)      ? opts[:upgrade]         : false
       @git_client       = opts.has_key?(:git_client)   ? opts[:git_client].dup  : nil
       @verbose          = opts.has_key?(:verbose)      ? opts[:verbose]         : false
+      @multi_cookbook_dir = opts[:multi_cookbook_dir]
       check_updates if @auto_upgrade && @upgrade
     end
 
@@ -91,6 +93,22 @@ module Berktacular
       ver = (upgrade && @candidates && @candidates.first) || @version_number
       line = []
       if config
+        # Allow using coobkooks residing in subdirectories of a "multi-cookbook directory"
+        # (this can be e.g. the Chef repository) if the version matches.
+        if config.has_key?('rel') && @multi_cookbook_dir
+          local_cookbook_dir = File.join(@multi_cookbook_dir, config['rel'])
+          if Dir.exists?(local_cookbook_dir)
+            metadata_path = Dir["#{File.join(local_cookbook_dir, 'metadata')}.{rb,json}"].first
+            if metadata_path
+              metadata = Ridley::Chef::Cookbook::Metadata.from_file(metadata_path)
+              if metadata.version == ver
+                line << "path: \"#{local_cookbook_dir}\""
+                return line.join(', ')
+              end
+            end
+          end
+        end
+
         if config.has_key?('github')
           line << "git: \"git@github.com:#{config['github']}.git\""
           line << "rel: \"#{config['rel']}\"" if config.has_key?('rel')
@@ -106,7 +124,7 @@ module Berktacular
           end
         end
       else
-        line << " \"#{ver}\""
+        line << "\"#{ver}\""
       end
       line.join(", ").gsub('%{version}', ver)
     end

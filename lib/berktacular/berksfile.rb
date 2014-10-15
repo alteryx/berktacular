@@ -35,7 +35,8 @@ module Berktacular
         :upgrade      => opts.has_key?(:upgrade)      ? opts[:upgrade]      : false,
         :github_token => opts.has_key?(:github_token) ? opts[:github_token] : nil,
         :verbose      => opts.has_key?(:verbose)      ? opts[:verbose]      : false,
-        :source_list  => opts.has_key?(:source_list)  ? opts[:source_list]  : []
+        :source_list  => opts.has_key?(:source_list)  ? opts[:source_list]  : [],
+        :multi_cookbook_dir => opts.has_key?(:multi_cookbook_dir) ? opts[:multi_cookbook_dir] : nil
       }
       @installed = {}
       # only connect once, pass the client to each cookbook.  and only if needed
@@ -194,7 +195,7 @@ module Berktacular
     # @return [Array] a list of Cookbook objects for this environment.
     def cookbooks
       @cookbooks ||= @cookbook_versions.sort.map do |book, version|
-        Cookbook.new(book, version, @cookbook_locations[book], @opts )
+        Cookbook.new(book, version, @cookbook_locations[book], @opts)
       end
     end
 
@@ -204,9 +205,9 @@ module Berktacular
       cookbooks.each do |b|
         candidates = b.check_updates
         next unless candidates.any?
-        puts  "Cookbook: #{b.name} (auto upgrade: #{b.auto_upgrade ? 'enabled' : 'disabled'})",
-              "\tCurrent: #{b.version_number}",
-              "\tUpdates: #{candidates.join(", ")}"
+        puts "Cookbook: #{b.name} (auto upgrade: #{b.auto_upgrade ? 'enabled' : 'disabled'})",
+             "\tCurrent: #{b.version_number}",
+             "\tUpdates: #{candidates.join(", ")}"
       end
     end
 
