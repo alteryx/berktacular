@@ -20,7 +20,7 @@ class BerktacularTest < Minitest::Test
       @env['cookbook_versions'][b],
       @env['cookbook_locations'][b]
     )
-    assert_equal 'cookbook "postgresql",  "3.3.4"', c.to_s
+    assert_equal 'cookbook "postgresql", "3.3.4"', c.to_s
   end
   def test_complex_case
     b = 'lumberjack'
