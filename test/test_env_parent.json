@@ -1,0 +1,20 @@
+{
+  "name": "berktacular_parent",
+  "description": "Berktacular test parent environment",
+  "chef_type": "environment",
+  "json_class": "Chef::Environment",
+  "cookbook_versions": {
+    "lumberjack": "= 0.1.2"
+  },
+  "cookbook_locations": {
+    "lumberjack": {
+      "github": "hectcastro/chef-lumberjack",
+      "versions": {
+        "0.1.2": {
+          "ref": "314a5736f0a7ea044a346463f9a431620dc59f25"
+        }
+      },
+      "tag": "v%{version}"
+    }
+  }
+}

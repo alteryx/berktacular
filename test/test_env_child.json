@@ -1,0 +1,10 @@
+{
+  "name": "berktacular_child",
+  "description": "Berktacular test child environment",
+  "parent": "test_env_parent.json",
+  "chef_type": "environment",
+  "json_class": "Chef::Environment",
+  "cookbook_versions": {
+    "postgresql": "= 3.3.4"
+  }
+}

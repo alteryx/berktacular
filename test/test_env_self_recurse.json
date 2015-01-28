@@ -1,0 +1,22 @@
+{
+  "name": "berktacular_recursive",
+  "description": "Berktacular test recursive environment",
+  "parent": "test_env_self_recurse.json",
+  "chef_type": "environment",
+  "json_class": "Chef::Environment",
+  "cookbook_versions": {
+    "postgresql": "= 3.3.4",
+    "lumberjack": "= 0.1.2"
+  },
+  "cookbook_locations": {
+    "lumberjack": {
+      "github": "hectcastro/chef-lumberjack",
+      "versions": {
+        "0.1.2": {
+          "ref": "314a5736f0a7ea044a346463f9a431620dc59f25"
+        }
+      },
+      "tag": "v%{version}"
+    }
+  }
+}

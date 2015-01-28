@@ -118,12 +118,6 @@ unless env_file && File.exist?(env_file)
   exit 2
 end
 
-my_env = JSON.parse( File.read( env_file ) )
-if versions_only
-  # Ignore cookbook locations. Only include versions in the generated Berksfile.
-  my_env.delete('cookbook_locations')
-end
-
 unless github_token
   if File.exists? gtoken_path
     github_token = IO.read(gtoken_path).strip
@@ -162,7 +156,7 @@ puts "Using workdir: '#{workdir}'" if verbose
 # Create a new berksfile
 puts "Checking updates, this can take some time..." if check || upgrade
 b = Berktacular::Berksfile.new(
-  my_env,
+  env_file,
   upgrade: upgrade,
   github_token: github_token,
   verbose: verbose,
