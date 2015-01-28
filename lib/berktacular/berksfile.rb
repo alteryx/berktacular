@@ -1,5 +1,13 @@
 require 'ostruct'
 require 'json'
+require 'solve'
+
+class ::Hash
+  def deep_merge(second)
+    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
+    self.merge(second, &merger)
+  end
+end
 
 module Berktacular
 
@@ -25,19 +33,23 @@ module Berktacular
     # @option opts [True,False] :verbose (False) be more verbose.
     # @option opts [Array<String>] :source_list additional Berkshelf API sources to include in the
     #   generated Berksfile.
-    def initialize( environment, opts = {})
-      @env_hash           = environment # Save the whole thing so we can emit an updated version if needed.
-      @name               = environment['name']               || nil
-      @description        = environment['description']        || nil
-      @cookbook_versions  = environment['cookbook_versions']  || {}
-      @cookbook_locations = environment['cookbook_locations'] || {}
+    def initialize( env_path, opts = {})
       @opts = {
         :upgrade      => opts.has_key?(:upgrade)      ? opts[:upgrade]      : false,
         :github_token => opts.has_key?(:github_token) ? opts[:github_token] : nil,
         :verbose      => opts.has_key?(:verbose)      ? opts[:verbose]      : false,
         :source_list  => opts.has_key?(:source_list)  ? opts[:source_list]  : [],
-        :multi_cookbook_dir => opts.has_key?(:multi_cookbook_dir) ? opts[:multi_cookbook_dir] : nil
+        :multi_cookbook_dir => opts.has_key?(:multi_cookbook_dir) ? opts[:multi_cookbook_dir] : nil,
+        :versions_only => opts.has_key?(:versions_only) ? opts[:versions_only] : false,
+        :max_depth     => opts.has_key?(:max_depth) ? opts[:max_depth] : 10
       }
+      @counter  = 0
+      @env_hash =  expand_env_file(env_path)
+
+      @name               = @env_hash['name']               || nil
+      @description        = @env_hash['description']        || nil
+      @cookbook_versions  = @env_hash['cookbook_versions']  || {}
+      @cookbook_locations = @env_hash['cookbook_locations'] || {}
       @installed = {}
       # only connect once, pass the client to each cookbook.  and only if needed
       connect_to_git if @opts[:upgrade]
@@ -223,6 +235,30 @@ module Berktacular
         access_token: @opts[:github_token],
         auto_paginate: true
       )
+    end
+
+    # recursively expand env_file @opts[:max_depth] times.
+    # @return [Hash] of merged env_file
+    def expand_env_file(env_file)
+      raise "Exceeded max depth!" if @counter > @opts[:max_depth]
+      @counter+=1
+      env = {}
+      if File.exists?(env_file)
+        env = JSON.parse( File.read(env_file) )
+      else
+        raise "Environment file '#{env_file}' does not exist!"
+      end
+      if env.has_key? "parent"
+        parent = env["parent"]
+        if !File.exists?(parent)
+          parent = File.join(
+            File.dirname(env_file),
+            parent
+          )
+        end
+        env = expand_env_file( parent ).deep_merge( env )
+      end
+      env
     end
 
     def metadata_from_json(json_str)

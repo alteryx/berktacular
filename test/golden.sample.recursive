@@ -1,5 +1,5 @@
-# Name: 'berktacular'
-# Description: Berktacular test environment
+# Name: 'berktacular_child'
+# Description: Berktacular test child environment
 
 # This file is auto-generated, changes will be overwritten
 # Modify the .json environment file and regenerate this Berksfile to make changes.

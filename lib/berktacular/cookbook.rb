@@ -32,7 +32,8 @@ module Berktacular
       @version_solved   = Semverse::Version.new(@version_number)
       @auto_upgrade     = config && config['auto_upgrade']  || false
       @versions         = config && config['versions']      || {}
-      @config           = config ? config.reject{ |k,v| k == 'auto_upgrade' || k == 'versions' } : nil
+      @location         = config ? config.reject{ |k,v| k == 'auto_upgrade' || k == 'versions' } : nil
+      @version_only     = opts.has_key?(:versions_only) ? opts[:versions_only]  : false
       @upgrade          = opts.has_key?(:upgrade)      ? opts[:upgrade]         : false
       @git_client       = opts.has_key?(:git_client)   ? opts[:git_client].dup  : nil
       @verbose          = opts.has_key?(:verbose)      ? opts[:verbose]         : false
@@ -58,15 +59,15 @@ module Berktacular
     # param upgrade [True,False] ('@upgrade') whether or not to force the lastest version when @auto_update is enabled
     # @return [String] a Berksfile line for this cookbook
     def line(upgrade = @upgrade)
-      "cookbook \"#{@name}\", #{generate_conf_line(upgrade, @config )}"
+      "cookbook \"#{@name}\", #{generate_conf_line(upgrade, @location )}"
     end
 
     # @return [Array] a list of available cookbook version newer then we started with, with most recent first
     def check_updates
       tag_re = Regexp.new(
-        "^#{ (@config || {})['tag'] || '%{version}' }$" % { :version => "(#{VERSION_RE.source})" }
+        "^#{ (@location || {})['tag'] || '%{version}' }$" % { :version => "(#{VERSION_RE.source})" }
       )
-      @candidates ||= if @config && @config['github']
+      @candidates ||= if @location && @location['github']
         get_tags_from_github
       else
         []
@@ -92,7 +93,7 @@ module Berktacular
     def generate_conf_line(upgrade, config)
       ver = (upgrade && @candidates && @candidates.first) || @version_number
       line = []
-      if config
+      if config && ! @version_only
         # Allow using coobkooks residing in subdirectories of a "multi-cookbook directory"
         # (this can be e.g. the Chef repository) if the version matches.
         if config.has_key?('rel') && @multi_cookbook_dir
@@ -117,10 +118,10 @@ module Berktacular
         if @versions.has_key?(ver)
           line << "ref: \"#{@versions[ver]['ref']}\""
         else
-          if !@config.has_key?('tag')
+          if !@location.has_key?('tag')
             line << "tag: \"#{ver}\""
           else
-            line << "tag: \"#{@config['tag']}\""
+            line << "tag: \"#{@location['tag']}\""
           end
         end
       else
@@ -132,9 +133,9 @@ module Berktacular
     # return [Array] a list of tags from the github repository of this cookbook.
     def get_tags_from_github
       @@tags_cache ||= {}
-      repo_path = @config['github']
+      repo_path = @location['github']
       return @@tags_cache[repo_path] if @@tags_cache[repo_path]
-      tags = @git_client.tags(@config['github']).map { |obj| obj.name }
+      tags = @git_client.tags(@location['github']).map { |obj| obj.name }
       @@tags_cache[repo_path] = tags
       tags
     end
