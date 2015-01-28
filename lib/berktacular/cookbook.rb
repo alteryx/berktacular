@@ -65,7 +65,7 @@ module Berktacular
     # @return [Array] a list of available cookbook version newer then we started with, with most recent first
     def check_updates
       tag_re = Regexp.new(
-        "^#{ (@location || {})['tag'] || '%{version}' }$" % { :version => "(#{VERSION_RE.source})" }
+        "^#{ (@location || {})['tag'] || '%{version}' }$" % { version: "(#{VERSION_RE.source})" }
       )
       @candidates ||= if @location && @location['github']
         get_tags_from_github

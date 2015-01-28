@@ -2,9 +2,14 @@ require 'ostruct'
 require 'json'
 require 'solve'
 
+# Taken from http://stackoverflow.com/a/25990044
 class ::Hash
   def deep_merge(second)
-    merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
+    merger = proc { |key, v1, v2|
+      Hash === v1 && Hash === v2 ?
+        v1.merge(v2, &merger) :
+        [:undefined, nil, :nil].include?(v2) ? v1 : v2
+    }
     self.merge(second, &merger)
   end
 end
@@ -35,13 +40,13 @@ module Berktacular
     #   generated Berksfile.
     def initialize( env_path, opts = {})
       @opts = {
-        :upgrade      => opts.has_key?(:upgrade)      ? opts[:upgrade]      : false,
-        :github_token => opts.has_key?(:github_token) ? opts[:github_token] : nil,
-        :verbose      => opts.has_key?(:verbose)      ? opts[:verbose]      : false,
-        :source_list  => opts.has_key?(:source_list)  ? opts[:source_list]  : [],
-        :multi_cookbook_dir => opts.has_key?(:multi_cookbook_dir) ? opts[:multi_cookbook_dir] : nil,
-        :versions_only => opts.has_key?(:versions_only) ? opts[:versions_only] : false,
-        :max_depth     => opts.has_key?(:max_depth) ? opts[:max_depth] : 10
+        upgrade:       opts.has_key?(:upgrade)      ? opts[:upgrade]      : false,
+        github_token:  opts.has_key?(:github_token) ? opts[:github_token] : nil,
+        verbose:       opts.has_key?(:verbose)      ? opts[:verbose]      : false,
+        source_list:   opts.has_key?(:source_list)  ? opts[:source_list]  : [],
+        multi_cookbook_dir:  opts.has_key?(:multi_cookbook_dir) ? opts[:multi_cookbook_dir] : nil,
+        versions_only:  opts.has_key?(:versions_only) ? opts[:versions_only] : false,
+        max_depth:      opts.has_key?(:max_depth) ? opts[:max_depth] : 10
       }
       @counter  = 0
       @env_hash =  expand_env_file(env_path)
@@ -241,14 +246,14 @@ module Berktacular
     # @return [Hash] of merged env_file
     def expand_env_file(env_file)
       raise "Exceeded max depth!" if @counter > @opts[:max_depth]
-      @counter+=1
+      @counter += 1
       env = {}
       if File.exists?(env_file)
         env = JSON.parse( File.read(env_file) )
       else
         raise "Environment file '#{env_file}' does not exist!"
       end
-      if env.has_key? "parent"
+      if env.has_key?("parent")
         parent = env["parent"]
         if !File.exists?(parent)
           parent = File.join(
