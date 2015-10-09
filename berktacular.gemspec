@@ -19,7 +19,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency 'faraday', '~> 0.9'
   s.add_dependency 'octokit', '~> 3.0', '>= 3.0.0'
   s.add_dependency 'hashie', '~> 2.1'
-  s.add_dependency 'berkshelf', '~> 3.1'
+  s.add_dependency 'berkshelf', '>= 3.1'
   s.add_development_dependency 'yard', '~> 0.8'
   s.add_development_dependency 'minitest', '~> 5.3'
 
