@@ -46,7 +46,8 @@ module Berktacular
         source_list:   opts.has_key?(:source_list)  ? opts[:source_list]  : [],
         multi_cookbook_dir:  opts.has_key?(:multi_cookbook_dir) ? opts[:multi_cookbook_dir] : nil,
         versions_only:  opts.has_key?(:versions_only) ? opts[:versions_only] : false,
-        max_depth:      opts.has_key?(:max_depth) ? opts[:max_depth] : 10
+        max_depth:      opts.has_key?(:max_depth) ? opts[:max_depth] : 10,
+        parent_env_dir: opts.has_key?(:parent_env_dir) ? opts[:parent_env_dir] : nil
       }
       @counter  = 0
       @env_hash =  expand_env_file(env_path)
@@ -254,10 +255,11 @@ module Berktacular
         raise "Environment file '#{env_file}' does not exist!"
       end
       if env.has_key?("parent")
+        parent_env_dir = @opts[:parent_env_dir].nil? ? File.dirname(env_file) : @opts[:parent_env_dir]
         parent = env["parent"]
         if !File.exists?(parent)
           parent = File.join(
-            File.dirname(env_file),
+            parent_env_dir,
             parent
           )
         end

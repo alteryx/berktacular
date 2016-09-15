@@ -18,6 +18,7 @@ upload      = false
 berks_conf  = nil
 knife_conf  = nil
 workdir     = nil
+parent_env_dir = nil
 verbose     = false
 source_list = []
 versions_only = false
@@ -68,6 +69,9 @@ options =  OptionParser.new do |opts|
                                               "Default is a tmpdir somewhere (probably /tmp or /dev/shm)") do |w|
     workdir = w
     preserve = true
+  end
+  opts.on("--parent-env-directory DIR", String, "Directory to search for parent environments. Defaults to the directory of the env file") do |t|
+    parent_env_dir = t
   end
   opts.on("-m PATH", "--multi-cookbook-dir PATH", String,
       "Treat the given directory as a multi-cookbook directory, and allow referring to cookbooks " \
@@ -161,7 +165,8 @@ b = Berktacular::Berksfile.new(
   github_token: github_token,
   verbose: verbose,
   source_list: source_list,
-  multi_cookbook_dir: multi_cookbook_dir
+  multi_cookbook_dir: multi_cookbook_dir,
+  parent_env_dir: parent_env_dir
 )
 b.check_updates if check
 puts "#{b}" if printit
