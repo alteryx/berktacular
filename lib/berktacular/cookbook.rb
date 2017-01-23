@@ -113,7 +113,6 @@ module Berktacular
         if config.has_key?('github')
           line << "git: \"git@github.com:#{config['github']}.git\""
           line << "rel: \"#{config['rel']}\"" if config.has_key?('rel')
-          line << 'protocol: :ssh'
         end
         if @versions.has_key?(ver)
           line << "ref: \"#{@versions[ver]['ref']}\""
