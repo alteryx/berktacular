@@ -1,6 +1,11 @@
 Berktacular
 ===========
 
+##Requirements:
+
+### Chef
+- Chef 12
+
 Berktacular is a gem that parses json type chef environment files and does things with them.
 It supports an additional json field called "cookbook_locations" containing a hash of cookbook locations at the same level as "cookbook_versions"
 The top level key is the cookbook name.  Under it, the following keys are supported:
